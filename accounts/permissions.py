@@ -7,3 +7,10 @@ class IsStudent(BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.is_student
+
+class IsTeacher(BasePermission):
+    """
+    Global permission check if user is a teacher
+    """
+    def has_permission(self, request, view):
+        return request.user.is_teacher

@@ -64,3 +64,5 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username + "_" + self.university_number
+
+
