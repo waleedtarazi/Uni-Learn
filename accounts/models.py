@@ -1,8 +1,5 @@
-from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.transaction import rollback
-from django.utils.translation import gettext_lazy as _
 
 class ROLES(models.TextChoices):
     ADMIN = "admin", "Admin"
@@ -11,6 +8,19 @@ class ROLES(models.TextChoices):
     EMPLOYEE = "employee", "Employee"
     STUDENT = "student", "Student"
 
+
+class Year(models.TextChoices):
+    FIRST = "1st", "First Year"
+    SECOND = "2nd", "Second Year"
+    THIRD = "3rd", "Third Year"
+    FOURTH = "4th", "Fourth Year"
+    FIFTH = "5th", "Fifth Year"
+
+class Major(models.TextChoices):
+    CS = "CS","Computer Science"
+    AI = "AI","Artificial Intelligence"
+    SE = "SE","Software Engineering"
+    NE = "NE", "Networking Engineering"
 
 
 class CustomUser(AbstractUser):
@@ -41,26 +51,14 @@ class CustomUser(AbstractUser):
         return self.username + "_" +self.role
 
 class Student(models.Model):
-    YEARS = {
-        "1st": "First Year",
-        "2ed": "Second Year",
-        "3ed": "Third Year",
-        "4th" : "Fourth Year",
-        "5th" : "Fifth Year",
-        "6th" : "Sixth Year"
-    }
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="student_profile")
-    MAJORS = {
-        "CS":"Computer Science",
-        "AI":"Artificial Intelligence",
-        "SE":"Software Engineering",
-        "NE": "Networking Engineering",
-    }
+
 
     university_number = models.CharField(max_length=20, unique=True, blank=False)
     gpa = models.FloatField(default=0.0)
-    year = models.CharField(max_length=14, blank=False, choices=YEARS, default="1st")
-    major = models.CharField(max_length=20, blank=False, choices=MAJORS, default="CS")
+    year = models.CharField(max_length=14, blank=False, choices=Year.choices, default="1st")
+    major = models.CharField(max_length=20, blank=False, choices=Major.choices, default="CS")
 
     def __str__(self):
         return self.user.username + "_" + self.university_number

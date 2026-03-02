@@ -1,11 +1,10 @@
-import logging
 from typing import Any
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenRefreshSerializer, TokenObtainPairSerializer, AuthUser
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer, TokenObtainPairSerializer
 from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.tokens import Token
 
-from accounts.models import CustomUser, ROLES
+from accounts.models import CustomUser
 from accounts.serializers import UserSerializer
 
 

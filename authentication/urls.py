@@ -1,5 +1,5 @@
 from rest_framework import routers
-from django.urls import include, path
+from django.urls import path
 from authentication.views import UserSignupView, CustomTokenRefreshView, CustomTokenObtainPairView, DecodeTokenView
 from rest_framework_simplejwt.views import (
     TokenVerifyView
