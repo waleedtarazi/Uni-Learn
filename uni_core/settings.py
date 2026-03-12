@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import os
+import sys
 from datetime import timedelta
 from pathlib import Path
-
-from django.conf.global_settings import AUTH_USER_MODEL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cl^a8&gp4n-hw#(f$lsr-6s)4jo4@361m$^q*r54nn4i&z6f-y'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if h] if not DEBUG else []
 
 
 # Application definition
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "accounts",
     "authentication",
+    "academics",
+    "enrollments",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
@@ -87,8 +89,12 @@ WSGI_APPLICATION = 'uni_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':  'django.db.backends.postgresql',
+        'NAME': os.environ.get("POSTGRES_DB", "unilearn"),
+        'USER': os.environ.get("POSTGRES_USER", "uni_user"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD", "828355"),
+        'HOST': os.environ.get("POSTGRES_HOST", "localhost"),
+        'PORT': os.environ.get("POSTGRES_PORT", "5432"),
     }
 }
 
@@ -138,14 +144,13 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication'
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '2/day',
-        'user': '5/day'
-    }
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ]
 }
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

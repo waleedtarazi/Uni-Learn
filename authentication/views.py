@@ -1,12 +1,14 @@
 # Create your views here.
 from rest_framework import status, generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
 
-
-from authentication.serializers import CustomTokenRefreshSerializer, UserSignUpSerializer, CustomTokenObtainPairSerializer
+from accounts.models import Student
+from accounts.views import StudentProfile
+from authentication.serializers import CustomTokenRefreshSerializer, StudentSignUpSerializer, CustomTokenObtainPairSerializer
 
 
 # Create your views here.
@@ -19,19 +21,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-class UserSignupView(generics.CreateAPIView):
-    serializer_class = UserSignUpSerializer
+class StudentSignupView(generics.CreateAPIView):
+    serializer_class = StudentSignUpSerializer
     permission_classes = [AllowAny]
 
-from rest_framework_simplejwt.tokens import UntypedToken, AccessToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-
-class DecodeTokenView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        token = request.data.get("token")
-        try:
-            decoded = AccessToken(token)  # Validates signature & expiry
-            return Response({"decoded_payload": decoded})
-        except (InvalidToken, TokenError) as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

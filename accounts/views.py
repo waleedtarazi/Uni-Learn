@@ -14,7 +14,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
 class StaffProfile(generics.RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ~IsStudent]
     serializer_class = UserSerializer
     def get_object(self):
         return self.request.user

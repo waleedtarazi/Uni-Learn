@@ -23,6 +23,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path("api/", include("accounts.urls")),
     path("api/",include("authentication.urls")),
+    path("api/",include("enrollments.urls")),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
     path('api/schema/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

@@ -8,32 +8,28 @@ from accounts.models import CustomUser
 from accounts.serializers import UserSerializer
 
 
-class UserSignUpSerializer(serializers.ModelSerializer):
+class StudentSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username','first_name','last_name','email', 'password','role']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password']
         extra_kwargs = {
-            'password':{'write_only':True},
-            'role': {'write_only': True}
+            'password': {'write_only': True},
         }
 
-    def create(self, validation_data: object):
-        user = CustomUser.objects.create_user( **validation_data)
-        return user
-
-    # def to_representation(self, instance):
-    #     print(CustomTokenObtainPairSerializer.get_token(request.user))
-    #     pass
+    def create(self, validated_data):
+        # Public signup is always a student account.
+        return CustomUser.objects.create_user(
+            role="student",
+            **validated_data
+        )
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user) -> Token:
         token = super().get_token(user)
-        token["username"]=user.username
-        print(f"Payload after update: {token}")
-        # ['username'] = user.username
+        token["username"] = user.username
         return token
 
     def validate(self, attrs):
@@ -48,7 +44,6 @@ class CustomTokenRefreshSerializer(TokenRefreshSerializer):
         data = super(CustomTokenRefreshSerializer,self).validate(attrs)
         decode_payload = token_backend.decode(data['access'], verify=True)
         user_id = decode_payload['user_id']
-        print(f" user is-> {user_id}")
         user_object = UserSerializer(CustomUser.objects.get(pk=user_id))
         data.update(user_object.data)
         return data
